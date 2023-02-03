@@ -1,4 +1,9 @@
 #TODO: Import your dependencies.
+
+import os
+import logging
+import sys
+
 #For instance, below are some dependencies you might need if you are using Pytorch
 import numpy as np
 import torch
@@ -10,13 +15,38 @@ import torchvision.transforms as transforms
 
 import argparse
 
-def test(model, test_loader):
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
+
+# define logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.addFilter(logging.StreamHandler(sys.stdout))
+
+
+def test(model, test_loader, device):
     '''
     TODO: Complete this function that can take a model and a 
           testing data loader and will get the test accuray/loss of the model
           Remember to include any debugging/profiling hooks that you might need
     '''
-    pass
+    model.eval()
+    running_loss = 0.0
+    running_corrects = 0
+    with torch.no_grad():
+        for inputs, labels in test_loader:
+            inputs = inputs.to(device)
+            labels = labels.to(device)
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            running_loss += loss.item() * inputs.size(0)
+            pred = outputs.argmax(dim=1, keepdim=True)
+            running_corrects += pred.eq(labels.view_as(pred)).sum().item()
+
+    test_loss = running_loss / len(test_loader.dataset)
+    test_acc = running_corrects / len(test_loader.dataset)
+    print(f"Testing Accuracy: {100 * test_acc:.2f}%, Test Loss: {test_loss:.4f}")
+    
 
 def train(model, train_loader, criterion, optimizer):
     '''
