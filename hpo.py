@@ -1,4 +1,4 @@
-#TODO: Import your dependencies.
+# Required Imports
 
 import os
 import logging
@@ -63,7 +63,7 @@ def train(model, train_loader, criterion, optimizer):
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, labels)
-        pred = outputs.argmax(dim=1, keepdim=True)
+        _, pred = outputs.argmax(dim=1, keepdim=True)
         running_loss += loss.item() * inputs.size(0)
         running_corrects += pred.eq(labels.view_as(pred)).sum().item()
         loss.backward()
@@ -74,10 +74,9 @@ def train(model, train_loader, criterion, optimizer):
     
     
 def net():
-    '''
-    TODO: Complete this function that initializes your model
-          Remember to use a pretrained model
-    '''
+    
+    # Function initializes model using a pretrained model
+
     model = models.resnet50(pretrained=True)
     
     for param in model.parameters():
@@ -171,7 +170,7 @@ if __name__=='__main__':
     parser.add_argument(
         '--epochs',
         type=int,
-        default=10,
+        default=1,
         help='number of epochs to train (default: 10)',
         metavar='N'
     )
@@ -183,7 +182,7 @@ if __name__=='__main__':
         help='input batch size for training (default: 64)',
         metavar='N'
     )
-    
+
     args=parser.parse_args()
     
     main(args)
